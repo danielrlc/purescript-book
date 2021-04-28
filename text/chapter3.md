@@ -113,7 +113,7 @@ PureScript's functions correspond to JavaScript's functions. The PureScript stan
 ```text
 > import Prelude
 > :type flip
-forall a b c. (a -> b -> c) -> b -> a -> c
+forall (a :: Type) (b :: Type) (c :: Type). (a -> b -> c) -> b -> a -> c
 
 > :type const
 forall a b. a -> b -> a
@@ -585,7 +585,7 @@ Most of the functions discussed so far used _prefix_ function application, where
 > book1 = insertEntry john emptyBook
 ```
 
-However, this chapter has also included examples of _infix_ [binary operators](https://github.com/purescript/documentation/blob/master/language/Syntax.md#binary-operators), such as  the `==` operator in the definition of `filterEntry`, where the operator is put _between_ the two arguments. These infix operators are actually defined in the PureScript source as infix aliases for their underlying _prefix_ implementations. For example, `==` is defined as an infix alias for the prefix `eq` function with the line:
+However, this chapter has also included examples of _infix_ [binary operators](https://github.com/purescript/documentation/blob/master/language/Syntax.md#binary-operators), such as the `==` operator in the definition of `filterEntry`, where the operator is put _between_ the two arguments. These infix operators are actually defined in the PureScript source as infix aliases for their underlying _prefix_ implementations. For example, `==` is defined as an infix alias for the prefix `eq` function with the line:
 
 ```haskell
 infix 4 eq as ==
@@ -642,6 +642,7 @@ book6 = john ++ peggy ++ ned ++ emptyBook
 Another common technique for eliminating parens is to use `apply`'s infix operator `$`, along with your standard prefix functions.
 
 For example, the earlier `book3` example could be rewritten as:
+
 ```haskell
 book7 = insertEntry john $ insertEntry peggy $ insertEntry ned emptyBook
 ```
@@ -660,9 +661,11 @@ infixr 0 apply as $
 The `apply` function takes another function (of type `(a -> b)`) as its first argument and a value (of type `a`) as its second argument, then calls that function with that value. If it seems like this function doesn't contribute anything meaningful, you are absolutely correct! Your program is logically identical without it (see [referential transparency](https://en.wikipedia.org/wiki/Referential_transparency)). The syntactic utility of this function comes from the special properties assigned to its infix operator. `$` is a right-associative (`infixr`), low precedence (`0`) operator, which lets us remove sets of parentheses for deeply-nested applications.
 
 Another parens-busting opportunity for the `$` operator is in our earlier `findEntry` function:
+
 ```haskell
 findEntry firstName lastName book = head $ filter filterEntry book
 ```
+
 We'll see an even more elegant way to rewrite this line with "function composition" in the next section.
 
 If you'd like to use a concise infix operator alias as a prefix function, you can surround it in parentheses:
@@ -730,11 +733,11 @@ I will let you make your own decision which definition is easier to understand, 
 
 ## Exercises
 
- 1. (Easy) Test your understanding of the `findEntry` function by writing down the types of each of its major subexpressions. For example, the type of the `head` function as used is specialized to `AddressBook -> Maybe Entry`. _Note_: There is no test for this exercise.
- 1. (Medium) Write a function `findEntryByStreet :: String -> AddressBook -> Maybe Entry` which looks up an `Entry` given a street address. _Hint_ reusing the existing code in `findEntry`. Test your function in PSCi and by running `spago test`.
- 1. (Medium) Rewrite `findEntryByStreet` to replace `filterEntry` with the composition (using `<<<` or `>>>`) of: a property accessor (using the `_.` notation); and a function that tests whether its given string argument is equal to the given street address.
- 1. (Medium) Write a function `isInBook` which tests whether a name appears in a `AddressBook`, returning a Boolean value. _Hint_: Use PSCi to find the type of the `Data.List.null` function, which tests whether a list is empty or not.
- 1. (Difficult) Write a function `removeDuplicates` which removes "duplicate" address book entries. We'll consider entries duplicated if they share the same first and last names, while ignoring `address` fields. _Hint_: Use PSCi to find the type of the `Data.List.nubByEq` function, which removes duplicate elements from a list based on an equality predicate. Note that the first element in each set of duplicates (closest to list head) is the one that is kept.
+1.  (Easy) Test your understanding of the `findEntry` function by writing down the types of each of its major subexpressions. For example, the type of the `head` function as used is specialized to `AddressBook -> Maybe Entry`. _Note_: There is no test for this exercise.
+1.  (Medium) Write a function `findEntryByStreet :: String -> AddressBook -> Maybe Entry` which looks up an `Entry` given a street address. _Hint_ reusing the existing code in `findEntry`. Test your function in PSCi and by running `spago test`.
+1.  (Medium) Rewrite `findEntryByStreet` to replace `filterEntry` with the composition (using `<<<` or `>>>`) of: a property accessor (using the `_.` notation); and a function that tests whether its given string argument is equal to the given street address.
+1.  (Medium) Write a function `isInBook` which tests whether a name appears in a `AddressBook`, returning a Boolean value. _Hint_: Use PSCi to find the type of the `Data.List.null` function, which tests whether a list is empty or not.
+1.  (Difficult) Write a function `removeDuplicates` which removes "duplicate" address book entries. We'll consider entries duplicated if they share the same first and last names, while ignoring `address` fields. _Hint_: Use PSCi to find the type of the `Data.List.nubByEq` function, which removes duplicate elements from a list based on an equality predicate. Note that the first element in each set of duplicates (closest to list head) is the one that is kept.
 
 ## Conclusion
 
